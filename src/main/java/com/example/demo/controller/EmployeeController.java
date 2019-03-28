@@ -9,7 +9,11 @@ import javax.persistence.EntityNotFoundException;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,6 +63,51 @@ public class EmployeeController {
 		return employeeDTOs;
 	}
 
+	// Demo for paging using data jpa
+	/**
+	 * 
+	 * @param id is a path variable denoting page number
+	 * @return all employees corresponding to the page number
+	 */
+	@GetMapping("/employees/some/{page}")
+	public List<EmployeeDTO> findSome(@PathVariable("page") int id) {
+		List<EmployeeDTO> employeeDTOs = new ArrayList();
+		Pageable pageable = PageRequest.of(id - 1, 5);
+		for (Employee e : employeeRepository.findAll(pageable)) {
+			employeeDTOs.add(convertToDTO(e));
+		}
+		if (!employeeDTOs.isEmpty()) {
+			return employeeDTOs;
+		}
+		else {
+			throw new IllegalArgumentException("No elements present for given page number");
+		}
+	}
+	
+	@GetMapping("/employees/sorted")
+	public List<EmployeeDTO> findSorted() {
+		List<EmployeeDTO> employeesDTOs = new ArrayList();
+		for(Employee e : employeeRepository.findAll(Sort.by("address").ascending())) {
+			employeesDTOs.add(convertToDTO(e));
+		}
+		return employeesDTOs;
+	}
+	
+	@GetMapping("/employees/sortPage/{page}")
+	public List<EmployeeDTO> findPagingWithSort(@PathVariable("page") int id) {
+		List<EmployeeDTO> employeeDTOs = new ArrayList();
+		Pageable pageable = PageRequest.of(id - 1, 5, Sort.by("address").ascending().and(Sort.by("team").descending()));
+		for (Employee e : employeeRepository.findAll(pageable)) {
+			employeeDTOs.add(convertToDTO(e));
+		}
+		if (!employeeDTOs.isEmpty()) {
+			return employeeDTOs;
+		}
+		else {
+			throw new IllegalArgumentException("No elements present for given page number");
+		}
+	}
+
 	/**
 	 * 
 	 * @param employeeDTO containing the id of an employee
@@ -71,7 +120,7 @@ public class EmployeeController {
 			Employee e = employee.get();
 			return convertToDTO(e);
 		} else {
-			throw new EntityNotFoundException("No data exists for given ID");
+			throw new EntityNotFoundException("No data exists for given ID - " + employeeDTO.getId());
 		}
 	}
 

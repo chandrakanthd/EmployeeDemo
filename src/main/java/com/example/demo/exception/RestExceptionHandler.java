@@ -44,7 +44,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
 		return buildResponseEntity(apiError);
 	}
 	
-	@ExceptionHandler(value = {EmptyResultDataAccessException.class, ConstraintViolationException.class})
+	@ExceptionHandler(value = {EmptyResultDataAccessException.class, 
+			ConstraintViolationException.class,
+			IllegalArgumentException.class})
 	protected ResponseEntity<Object> handleEmptyResultDataAccess(Exception ex){
 		ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
 		apiError.setMessage(ex.getMessage());

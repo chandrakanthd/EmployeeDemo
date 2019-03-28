@@ -20,8 +20,6 @@ public class ApiError {
 
 	private String debugMessage;
 
-	private List<ApiSubError> subErrors;
-
 	private ApiError() {
 		this.timestamp = LocalDateTime.now();
 	}
@@ -85,14 +83,6 @@ public class ApiError {
 
 	public void setDebugMessage(String debugMessage) {
 		this.debugMessage = debugMessage;
-	}
-
-	public List<ApiSubError> getSubErrors() {
-		return subErrors;
-	}
-
-	public void setSubErrors(List<ApiSubError> subErrors) {
-		this.subErrors = subErrors;
 	}
 
 }
