@@ -9,6 +9,7 @@ import javax.persistence.EntityNotFoundException;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,8 +39,10 @@ public class EmployeeController {
 
 	@Autowired
 	ModelMapper modelMapper;
-
-	static ResponseData responseData = new ResponseData();
+	
+	//Read the value from appication.properties file
+	@Value("${welcome.message}")
+	private String welcome;
 
 	/**
 	 * 
@@ -47,7 +50,7 @@ public class EmployeeController {
 	 */
 	@GetMapping("/")
 	public String homePage() {
-		return "Welcome to Management system";
+		return "Welcome to "+welcome;
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class EmployeeController {
 			Employee e = employee.get();
 			return convertToDTO(e);
 		} else {
-			throw new EntityNotFoundException("No data exists for given ID - " + employeeDTO.getId());
+			throw new EntityNotFoundException("No data exists for ID : " + employeeDTO.getId());
 		}
 	}
 
@@ -156,7 +159,8 @@ public class EmployeeController {
 	public ResponseData delete(@RequestBody EmployeeDTO employeeDTO) {
 		Employee employee = convertToEntity(employeeDTO);
 		employeeRepository.deleteById(employee.getId());
-
+		
+		ResponseData responseData = new ResponseData();
 		responseData.setResponseCode("200");
 		responseData.setResponseMsg("Deleted Successfully");
 		responseData.setTime(LocalDateTime.now().toString());
